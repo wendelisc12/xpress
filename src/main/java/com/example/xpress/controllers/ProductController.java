@@ -20,9 +20,14 @@ public class ProductController {
     private ProductService productService;
 
     @GetMapping
-    public List<Product> products(){
-        List<Product> results = productRepository.findAll();
-        return results;
+    public List<Product> products(@RequestParam(required = false) String q){
+        if(q == null){
+            List<Product> results = productRepository.findAll();
+            return results;
+        }else{
+            List<Product> results = productRepository.findByNameStartingWith(q);
+            return results;
+        }
     }
 
     @GetMapping("/{id}")
