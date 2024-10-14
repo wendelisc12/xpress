@@ -4,6 +4,7 @@ import com.example.xpress.entities.Category;
 import com.example.xpress.entities.Product;
 import com.example.xpress.repository.CategoryRepository;
 import com.example.xpress.repository.ProductRepository;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,14 +32,14 @@ public class CategoryController {
         return results;
     }
 
-    @GetMapping("/{name}/products")
-    public List<Product> getProductsByCategory(@PathVariable String name){
-        List<Product> results = productRepository.findByCategoryName(name);
+    @GetMapping("/{id}/products")
+    public List<Product> getProductsByCategory(@PathVariable Long id){
+        List<Product> results = productRepository.findByCategoryId(id);
         return results;
     }
 
     @PostMapping
-    public Category addCategorie(@RequestBody Category category){
+    public Category addCategorie(@Valid @RequestBody Category category){
         Category results = categoryRepository.save(category);
         return results;
     }
