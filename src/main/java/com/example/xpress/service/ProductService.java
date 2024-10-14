@@ -16,20 +16,31 @@ public class ProductService {
 
     public Product addProduct(Product product){
         if(product.getQttStock() < 0){
-            throw new RuntimeException("A quantidade de produto não pode ser inferior a zero.");
+            throw new RuntimeException("The product quantity cannot be less than zero.");
         }
 
         if(!product.isPerishable()){
             product.setExpirationDate(null);
         }else if(product.isPerishable() && product.getExpirationDate() == null){
-            throw new RuntimeException("Produtos perecíveis precisam ter uma data de validade.");
+            throw new RuntimeException("Perishable products must have an expiration date.");
         }
 
         if(productRepository.existsByName(product.getName())){
-            throw new RuntimeException("Esse produto já existe no catálogo");
+            throw new RuntimeException("This product already exists in the catalog.");
         }
 
         return productRepository.save(product);
+    }
 
+    public Product updateQttStock(Long id, int Qtt){
+        Product product = productRepository.findById(id).get();
+
+        if(Qtt < 0){
+            throw new RuntimeException("You cannot enter values below 0.");
+        }else{
+            product.setQttStock(Qtt);
+            Product newProduct = productRepository.save(product);
+            return newProduct;
+        }
     }
 }

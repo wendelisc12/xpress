@@ -3,6 +3,7 @@ package com.example.xpress.controllers;
 import com.example.xpress.entities.Product;
 import com.example.xpress.repository.ProductRepository;
 import com.example.xpress.service.ProductService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,9 +38,15 @@ public class ProductController {
     }
 
     @PostMapping
-    public Product addProduct(@RequestBody Product product){
+    public Product addProduct(@Valid @RequestBody Product product){
         Product newProduct = productService.addProduct(product);
         return newProduct;
+    }
+
+    @PatchMapping
+    public Product addQttStock(@PathVariable(name = "id") Long id, @RequestParam(name = "Qtt") int Qtt){
+        Product product = productService.updateQttStock(id, Qtt);
+        return product;
     }
 
     @DeleteMapping
