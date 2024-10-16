@@ -29,7 +29,7 @@ public class CartController {
 
     @GetMapping("/{id}")
     public Cart getCart(@PathVariable Long id){
-        Cart results = cartRepository.findById(id).get();
+        Cart results = cartRepository.findById(id).orElseThrow(() -> new RuntimeException("Cart doesn't exists."));
         return results;
     }
 
