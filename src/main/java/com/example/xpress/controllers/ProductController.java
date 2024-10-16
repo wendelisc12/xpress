@@ -5,6 +5,7 @@ import com.example.xpress.repository.ProductRepository;
 import com.example.xpress.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -50,8 +51,9 @@ public class ProductController {
     }
 
     @DeleteMapping
-    public void deleteProduct(@RequestParam(name = "id") Long id){
+    public ResponseEntity<String> deleteProduct(@RequestParam(name = "id") Long id){
         productRepository.deleteById(id);
+        return ResponseEntity.ok("Product was successfully deleted.");
     }
 
 }

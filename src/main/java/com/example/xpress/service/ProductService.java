@@ -3,6 +3,7 @@ package com.example.xpress.service;
 import com.example.xpress.entities.Product;
 import com.example.xpress.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -42,5 +43,16 @@ public class ProductService {
             Product newProduct = productRepository.save(product);
             return newProduct;
         }
+    }
+
+    public void downQttStock(Long id, int qttToDown){
+        Product product = productRepository.findById(id).get();
+
+        if(product.getQttStock() != 0){
+            product.setQttStock(product.getQttStock() - qttToDown);
+        }else{
+            throw new RuntimeException("The stock is currently empty.");
+        }
+
     }
 }
