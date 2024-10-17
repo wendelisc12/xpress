@@ -27,4 +27,8 @@ public class PaymentController {
         return results;
     }
 
+    @DeleteMapping
+    public void deletePayment(@RequestParam Long id){
+        paymentRepository.deleteById(id);
+    }
 }
