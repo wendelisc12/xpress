@@ -32,7 +32,6 @@ public class SaleService {
         }
 
         Sale newSale = new Sale();
-        newSale.setCart(cart);
         newSale.setDate(new Date());
         newSale.setQuantity(cart.getTotalQuantity());
         newSale.setTotalPrice(cart.getTotalPrice());
@@ -54,14 +53,7 @@ public class SaleService {
         newSale.setItems(saleItemList);
         Sale sale = saleRepository.save(newSale);
 
-        for(CartItem cartItem : cart.getItems()){
-            cartItem.setCart(null);
-        }
-
-        cart.getItems().clear();
-        cart.setTotalQuantity(0);
-        cart.setTotalPrice(0.0);
-        cartRepository.save(cart);
+        cartRepository.deleteById(cartId);
 
         return sale;
     }
