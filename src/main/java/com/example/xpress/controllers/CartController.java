@@ -38,4 +38,9 @@ public class CartController {
         Cart results = cartService.addProductToCart(cartId, productId, quantity);
         return results;
     }
+
+    @DeleteMapping("/{id}")
+    public void deleteCart(@PathVariable Long id){
+        cartRepository.deleteById(id);
+    }
 }
