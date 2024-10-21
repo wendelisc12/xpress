@@ -2,7 +2,9 @@ package com.example.xpress.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.cglib.core.Local;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -26,7 +28,7 @@ public class Product {
 
     @NotNull(message = NOT_NULL_MESSAGE)
     private int qttStock;
-    private Date expirationDate;
+    private LocalDate expirationDate;
     @NotNull(message = NOT_NULL_MESSAGE)
     private boolean perishable;
 
@@ -65,11 +67,11 @@ public class Product {
         this.qttStock = qttStock;
     }
 
-    public Date getExpirationDate() {
+    public LocalDate getExpirationDate() {
         return expirationDate;
     }
 
-    public void setExpirationDate(Date expirationDate) {
+    public void setExpirationDate(LocalDate expirationDate) {
         this.expirationDate = expirationDate;
     }
 
