@@ -21,6 +21,9 @@ public class CartService {
     ProductRepository productRepository;
 
     @Autowired
+    ProductService productService;
+
+    @Autowired
     CartItemRepository cartItemRepository;
 
     public Cart addProductToCart(Long cartId, Long productId, int quantity){
@@ -31,8 +34,18 @@ public class CartService {
 
         for(CartItem item : cart.getItems()){
             if(item.getProduct().getId().equals(productId)){
-                item.setQuantity(item.getQuantity() + quantity);
-                item.setPrice(item.getPrice() + product.getPrice() * quantity);
+                if(quantity > product.getQttStock()){
+                    throw new RuntimeException("Requested quantity exceeds available stock.");
+                }else{
+                    item.setQuantity(item.getQuantity() + quantity);
+                    productService.downQttStock(product, quantity);
+                    productRepository.save(product);
+                }
+                cart.setTotalPrice(cart.getTotalPrice() + (product.getPrice() * quantity));
+                item.setPrice(item.getPrice() + (product.getPrice() * quantity));
+
+                cart.setTotalQuantity(cart.getTotalQuantity() + quantity);
+                cartRepository.save(cart);
                 isProductExistsOnCart = true;
                 break;
             }
@@ -43,7 +56,13 @@ public class CartService {
             newCartItem.setProduct(product);
             newCartItem.setCart(cart);
             newCartItem.setPrice(product.getPrice() * quantity);
-            newCartItem.setQuantity(quantity);
+            if(quantity > product.getQttStock()){
+                throw new RuntimeException("Requested quantity exceeds available stock.");
+            }else{
+                newCartItem.setQuantity(quantity);
+                productService.downQttStock(product, quantity);
+                productRepository.save(product);
+            }
 
             cart.getItems().add(newCartItem);
             cart.setTotalPrice(cart.getTotalPrice() + newCartItem.getPrice());
