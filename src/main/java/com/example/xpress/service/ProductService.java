@@ -6,18 +6,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.Date;
+
 @Service
 public class ProductService {
 
     @Autowired
     private ProductRepository productRepository;
 
-    public ProductService(){
-    }
-
     public Product addProduct(Product product){
         if(product.getQttStock() < 0){
             throw new RuntimeException("The product quantity cannot be less than zero.");
+        }
+
+        if(product.getExpirationDate().isBefore(LocalDate.now())){
+            throw new RuntimeException("The expiration date cannot be expired.");
         }
 
         if(!product.isPerishable()){
@@ -34,7 +38,7 @@ public class ProductService {
     }
 
     public Product updateQttStock(Long id, int Qtt){
-        Product product = productRepository.findById(id).get();
+        Product product = productRepository.findById(id).orElseThrow(() -> new RuntimeException("Product not found."));
 
         if(Qtt < 0){
             throw new RuntimeException("You cannot enter values below 0.");
@@ -45,9 +49,7 @@ public class ProductService {
         }
     }
 
-    public void downQttStock(Long id, int qttToDown){
-        Product product = productRepository.findById(id).get();
-
+    public void downQttStock(Product product, int qttToDown){
         if(product.getQttStock() != 0){
             product.setQttStock(product.getQttStock() - qttToDown);
         }else{
