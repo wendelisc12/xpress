@@ -1,5 +1,6 @@
 package com.example.xpress.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
@@ -18,6 +19,10 @@ public class Cart{
 
     private int totalQuantity;
     private double totalPrice;
+
+    @OneToOne(mappedBy = "cart")
+    @JsonBackReference
+    private Users user;
 
     public Long getId() {
         return id;
@@ -49,5 +54,19 @@ public class Cart{
 
     public void setTotalPrice(double totalPrice) {
         this.totalPrice = totalPrice;
+    }
+
+    public void clearCart() {
+        this.items.clear();
+        this.totalQuantity = 0;
+        this.totalPrice = 0.0;
+    }
+
+    public Users getUser() {
+        return user;
+    }
+
+    public void setUser(Users user) {
+        this.user = user;
     }
 }
