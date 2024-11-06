@@ -5,8 +5,11 @@ import com.example.xpress.entities.Product;
 import com.example.xpress.repository.CategoryRepository;
 import com.example.xpress.repository.ProductRepository;
 import jakarta.validation.Valid;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.function.EntityResponse;
 
 import java.util.List;
 
@@ -28,7 +31,7 @@ public class CategoryController {
 
     @GetMapping("/{id}")
     public Category getCategoryById(@PathVariable Long id){
-        Category results = categoryRepository.findById(id).get();
+        Category results = categoryRepository.findById(id).orElseThrow(() -> new RuntimeException("Category not found."));
         return results;
     }
 
@@ -39,13 +42,14 @@ public class CategoryController {
     }
 
     @PostMapping
-    public Category addCategorie(@Valid @RequestBody Category category){
+    public Category addCategory(@Valid @RequestBody Category category){
         Category results = categoryRepository.save(category);
         return results;
     }
 
     @DeleteMapping
-    public void deleteCategoryById(@RequestParam Long id){
+    public ResponseEntity<String> deleteCategoryById(@RequestParam Long id){
         categoryRepository.deleteById(id);
+        return ResponseEntity.ok("Category was successfully deleted.");
     }
 }

@@ -5,6 +5,7 @@ import com.example.xpress.repository.ProductRepository;
 import com.example.xpress.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,25 +34,32 @@ public class ProductController {
 
     @GetMapping("/{id}")
     public Product getProductById(@PathVariable Long id){
-        Product results = productRepository.findById(id).get();
+        Product results = productRepository.findById(id).orElseThrow(() -> new RuntimeException("Product not found."));
+        return results;
+    }
+
+    @PostMapping("/addStock/{id}")
+    public Product addToStock(@RequestParam Integer qtt, @PathVariable Long id, @RequestHeader("Authorization") String token){
+        Product results = productService.addToStock(id, qtt, token);
         return results;
     }
 
     @PostMapping
-    public Product addProduct(@Valid @RequestBody Product product){
-        Product newProduct = productService.addProduct(product);
+    public Product addProduct(@Valid @RequestBody Product product, @RequestHeader("Authorization") String token){
+        Product newProduct = productService.addProduct(token,product);
         return newProduct;
     }
 
     @PatchMapping
-    public Product addQttStock(@PathVariable(name = "id") Long id, @RequestParam(name = "Qtt") int Qtt){
-        Product product = productService.updateQttStock(id, Qtt);
+    public Product addQttStock(@PathVariable(name = "id") Long id, @RequestParam(name = "Qtt") int Qtt, @RequestHeader String token){
+        Product product = productService.updateQttStock(id, Qtt, token);
         return product;
     }
 
     @DeleteMapping
-    public void deleteProduct(@RequestParam(name = "id") Long id){
+    public ResponseEntity<String> deleteProduct(@RequestParam(name = "id") Long id){
         productRepository.deleteById(id);
+        return ResponseEntity.ok("Product was successfully deleted.");
     }
 
 }
