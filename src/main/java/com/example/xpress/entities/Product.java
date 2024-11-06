@@ -1,5 +1,7 @@
 package com.example.xpress.entities;
 
+import com.example.xpress.views.Views;
+import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.cglib.core.Local;
@@ -15,20 +17,31 @@ public class Product {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonView(Views.Public.class)
     private Long id;
+
     @NotNull(message = NOT_NULL_MESSAGE)
+    @JsonView(Views.Public.class)
     private String name;
+
     @NotNull(message = NOT_NULL_MESSAGE)
+    @JsonView(Views.Public.class)
     private Float price;
 
     @ManyToOne
     @JoinColumn(name = "id_category")
     @NotNull(message = NOT_NULL_MESSAGE)
+    @JsonView(Views.Public.class)
     private Category category;
 
     @NotNull(message = NOT_NULL_MESSAGE)
+    @JsonView(Views.Public.class)
     private int qttStock;
+
+    @JsonView(Views.Public.class)
     private LocalDate expirationDate;
+
+    @JsonView(Views.Public.class)
     @NotNull(message = NOT_NULL_MESSAGE)
     private boolean perishable;
 

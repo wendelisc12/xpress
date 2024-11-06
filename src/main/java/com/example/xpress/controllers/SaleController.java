@@ -10,11 +10,10 @@ import com.example.xpress.service.SaleService;
 import jakarta.persistence.Entity;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @RestController
 @RequestMapping("/sale")
@@ -26,15 +25,29 @@ public class SaleController {
     SaleService saleService;
 
     @GetMapping
-    public List<Sale> getSales(){
+    public List<Sale> getSales(@RequestHeader("Authorization")String token){
         List<Sale> results = saleRepository.findAll();
         return results;
     }
 
-    @PostMapping("/{cartId}")
+    @GetMapping("/{id}")
+    public Sale getSaleById(@RequestHeader("Authorization")String token, String id){
+        System.out.println(id);
+        return saleRepository.findById(id).orElseThrow(() -> new RuntimeException("Sale not found."));
+    }
+
+    @PostMapping
     @Transactional
-    public Sale makeSale(@PathVariable Long cartId, @RequestParam Long paymentId){
-        Sale results = saleService.makeSale(cartId, paymentId);
-        return results;
+    public ResponseEntity makeSale(@RequestHeader("Authorization") String token, @RequestParam Long paymentId){
+        Sale results = saleService.makeSale(token, paymentId);
+        Map<String, Object> response = new HashMap<>();
+        response.put("sale", results);
+        boolean isStockLow = results.getItems().stream().anyMatch(item -> item.getProduct().getQttStock() <= 10);
+
+        if (isStockLow) {
+            response.put("warning", "One or more products have less than 10 in stock.");
+        }
+
+        return ResponseEntity.ok(response);
     }
 }

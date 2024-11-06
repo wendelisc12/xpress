@@ -34,19 +34,25 @@ public class ProductController {
 
     @GetMapping("/{id}")
     public Product getProductById(@PathVariable Long id){
-        Product results = productRepository.findById(id).get();
+        Product results = productRepository.findById(id).orElseThrow(() -> new RuntimeException("Product not found."));
+        return results;
+    }
+
+    @PostMapping("/addStock/{id}")
+    public Product addToStock(@RequestParam Integer qtt, @PathVariable Long id, @RequestHeader("Authorization") String token){
+        Product results = productService.addToStock(id, qtt, token);
         return results;
     }
 
     @PostMapping
-    public Product addProduct(@Valid @RequestBody Product product){
-        Product newProduct = productService.addProduct(product);
+    public Product addProduct(@Valid @RequestBody Product product, @RequestHeader("Authorization") String token){
+        Product newProduct = productService.addProduct(token,product);
         return newProduct;
     }
 
     @PatchMapping
-    public Product addQttStock(@PathVariable(name = "id") Long id, @RequestParam(name = "Qtt") int Qtt){
-        Product product = productService.updateQttStock(id, Qtt);
+    public Product addQttStock(@PathVariable(name = "id") Long id, @RequestParam(name = "Qtt") int Qtt, @RequestHeader String token){
+        Product product = productService.updateQttStock(id, Qtt, token);
         return product;
     }
 

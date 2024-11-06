@@ -2,10 +2,15 @@ package com.example.xpress.controllers;
 
 import com.example.xpress.entities.Cart;
 import com.example.xpress.entities.Product;
+import com.example.xpress.entities.Users;
 import com.example.xpress.repository.CartRepository;
+import com.example.xpress.repository.UserRepository;
 import com.example.xpress.service.CartService;
+import com.example.xpress.service.TokenService;
+import org.antlr.v4.runtime.Token;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,24 +23,26 @@ public class CartController {
     @Autowired
     CartService cartService;
 
-    @PostMapping
-    public Cart createCart(){
-        Cart results = new Cart();
-        results.setTotalPrice(0);
-        results.setTotalPrice(0.0);
-        cartRepository.save(results);
-        return results;
+    @Autowired
+    TokenService tokenService;
+
+    @Autowired
+    UserRepository userRepository;
+
+    @GetMapping
+    public Cart getCart(@RequestHeader("Authorization")String token){
+        Users user = tokenService.getUserByToken(token);
+        if(user == null){
+            throw new RuntimeException("Cart not found");
+        }else{
+            return user.getCart();
+        }
+
     }
 
-    @GetMapping("/{id}")
-    public Cart getCart(@PathVariable Long id){
-        Cart results = cartRepository.findById(id).orElseThrow(() -> new RuntimeException("Cart doesn't exists."));
-        return results;
-    }
-
-    @PostMapping("/{cartId}/item")
-    public Cart addProductToCart(@PathVariable Long cartId, @RequestParam(name = "pId") Long productId, @RequestParam(name = "qtt") int quantity){
-        Cart results = cartService.addProductToCart(cartId, productId, quantity);
+    @PostMapping("/item")
+    public Cart addProductToCart(@RequestHeader("Authorization")  String token, @RequestParam(name = "pId") Long productId, @RequestParam(name = "qtt") int quantity){
+        Cart results = cartService.addProductToCart(token, productId, quantity);
         return results;
     }
 
