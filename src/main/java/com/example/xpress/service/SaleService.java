@@ -1,15 +1,16 @@
 package com.example.xpress.service;
 
 import com.example.xpress.entities.*;
-import com.example.xpress.repository.CartRepository;
-import com.example.xpress.repository.PaymentRepository;
-import com.example.xpress.repository.SaleRepository;
+import com.example.xpress.repository.*;
+import org.antlr.v4.runtime.Token;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class SaleService {
@@ -18,24 +19,50 @@ public class SaleService {
     SaleRepository saleRepository;
 
     @Autowired
-    CartRepository cartRepository;
-
-    @Autowired
     PaymentRepository paymentRepository;
 
-    public Sale makeSale(Long cartId, Long paymentId){
-        Cart cart = cartRepository.findById(cartId).orElseThrow(() -> new RuntimeException("Cart not found."));
-        Payment payment =  paymentRepository.findById(paymentId).orElseThrow(()-> new RuntimeException("Payment method not found."));
+    @Autowired
+    ProductRepository productRepository;
 
-        if(cart.getItems() == null){
+    @Autowired
+    ProductService productService;
+
+    @Autowired
+    TokenService tokenService;
+
+    @Autowired
+    InventoryTransactionRepository inventoryTransactionRepository;
+
+    public Sale makeSale(String token, Long paymentId){
+        Cart cart = tokenService.getUserByToken(token).getCart();
+        Payment payment =  paymentRepository.findById(paymentId).orElseThrow(()-> new RuntimeException("Payment method not found."));
+        Users user = tokenService.getUserByToken(token);
+
+        if(cart.getItems().isEmpty()){
             throw new RuntimeException("Cart is empty.");
         }
 
+        for(CartItem cartItem : cart.getItems()){
+            Product product = cartItem.getProduct();
+            productService.downQttStock(product, cartItem.getQuantity());
+            productRepository.save(product);
+
+            InventoryTransaction transaction = new InventoryTransaction();
+            transaction.setQuantity(cartItem.getQuantity());
+            transaction.setMovimentType(MovimentType.OUTGOING);
+            transaction.setProduct(product);
+            transaction.setUser(user);
+            transaction.setMovimentDate(LocalDateTime.now());
+            inventoryTransactionRepository.save(transaction);
+        }
+
         Sale newSale = new Sale();
+        newSale.setId(UUID.randomUUID().toString());
         newSale.setDate(new Date());
         newSale.setQuantity(cart.getTotalQuantity());
         newSale.setTotalPrice(cart.getTotalPrice());
         newSale.setPayment(payment);
+        newSale.setUser(user);
 
         List<SaleItem> saleItemList = new ArrayList<>();
 
@@ -53,7 +80,7 @@ public class SaleService {
         newSale.setItems(saleItemList);
         Sale sale = saleRepository.save(newSale);
 
-        cartRepository.deleteById(cartId);
+        cart.clearCart();
 
         return sale;
     }
