@@ -1,5 +1,6 @@
 package com.example.xpress.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
@@ -10,8 +11,7 @@ import java.util.List;
 @Entity
 public class Sale {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
     @OneToMany(mappedBy = "sale", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
@@ -24,6 +24,11 @@ public class Sale {
     private int quantity;
     private double totalPrice;
     private Date date;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    @JsonBackReference
+    private Users user;
 
     public int getQuantity() {
         return quantity;
@@ -41,11 +46,11 @@ public class Sale {
         this.payment = payment;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -71,5 +76,13 @@ public class Sale {
 
     public void setItems(List<SaleItem> items) {
         this.items = items;
+    }
+
+    public Users getUser() {
+        return user;
+    }
+
+    public void setUser(Users user) {
+        this.user = user;
     }
 }
