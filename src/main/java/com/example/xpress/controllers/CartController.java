@@ -1,6 +1,7 @@
 package com.example.xpress.controllers;
 
 import com.example.xpress.entities.Cart;
+import com.example.xpress.entities.CartItem;
 import com.example.xpress.entities.Product;
 import com.example.xpress.entities.Users;
 import com.example.xpress.repository.CartRepository;
@@ -41,8 +42,14 @@ public class CartController {
     }
 
     @PostMapping("/item")
-    public Cart addProductToCart(@RequestHeader("Authorization")  String token, @RequestParam(name = "pId") Long productId, @RequestParam(name = "qtt") int quantity){
+    public Cart addProductToCart(@RequestHeader("Authorization") String token, @RequestParam(name = "pId") Long productId, @RequestParam(name = "qtt") int quantity){
         Cart results = cartService.addProductToCart(token, productId, quantity);
+        return results;
+    }
+
+    @PostMapping("/removeItem")
+    public CartItem removeProductFromCart(@RequestHeader("Authorization") String token, @RequestParam(name = "pId") Long productId, @RequestParam(name = "qtt") int quantity){
+        CartItem results = cartService.removeItemFromCart(token, productId, quantity);
         return results;
     }
 
