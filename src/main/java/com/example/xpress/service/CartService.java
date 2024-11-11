@@ -14,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestHeader;
 
+import java.util.Iterator;
 import java.util.List;
 
 @Service
@@ -77,5 +78,54 @@ public class CartService {
         }
 
         return user.getCart();
+    }
+
+    public CartItem removeItemFromCart(String token,Long pId , int qttRemove) {
+        Users user = tokenService.getUserByToken(token);
+        CartItem modifiedCartItem = null;
+
+        if(qttRemove < 0){
+            throw new RuntimeException("the quantity to remove cannot be less than 0");
+        }
+
+        List<CartItem> cartItems = user.getCart().getItems();
+        Iterator<CartItem> iterator = cartItems.iterator();
+
+        while(iterator.hasNext()){
+            CartItem cartItem = iterator.next();
+
+            if(cartItem.getProduct().getId().equals(pId)){
+                int currentQtt = cartItem.getQuantity();
+
+                if(qttRemove >= currentQtt){
+                    iterator.remove();
+                }else{
+                    cartItem.setQuantity(currentQtt - qttRemove);
+                    cartItem.setPrice(cartItem.getQuantity() * cartItem.getProduct().getPrice());
+                }
+
+                modifiedCartItem = cartItem;
+            }
+        }
+
+        int totalQuantity = 0;
+        double totalPrice = 0.0;
+
+        for(CartItem cartItem : user.getCart().getItems()){
+            totalQuantity += cartItem.getQuantity();
+            totalPrice += cartItem.getPrice();
+        }
+
+        user.getCart().setTotalPrice(totalPrice);
+        user.getCart().setTotalQuantity(totalQuantity);
+
+        userRepository.save(user);
+        cartRepository.save(user.getCart());
+
+        if(modifiedCartItem != null){
+            return modifiedCartItem;
+        }
+
+        throw new RuntimeException("Product not found in the cart");
     }
 }
