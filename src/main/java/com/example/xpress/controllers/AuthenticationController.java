@@ -82,5 +82,11 @@ public class AuthenticationController {
         return ResponseEntity.ok("Logged off successfully");
     }
 
+    @GetMapping("/points")
+    public int getPoints(@RequestHeader("Authorization") String token){
+        Users user = tokenService.getUserByToken(token);
+        return user.getPoints();
+    }
+
 
 }

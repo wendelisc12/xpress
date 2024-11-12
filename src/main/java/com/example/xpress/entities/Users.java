@@ -43,6 +43,10 @@ public class Users implements UserDetails {
     @JsonView(Views.Public.class)
     private UserRole role;
 
+    @NotNull(message = NOT_NULL_MESSAGE)
+    @JsonView(Views.Public.class)
+    private int points;
+
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "cart_id", referencedColumnName = "id")
     @JsonManagedReference
@@ -87,6 +91,15 @@ public class Users implements UserDetails {
 
     public String getPassword() {
         return password;
+    }
+
+    @NotNull(message = NOT_NULL_MESSAGE)
+    public int getPoints() {
+        return points;
+    }
+
+    public void setPoints(@NotNull(message = NOT_NULL_MESSAGE) int points) {
+        this.points = points;
     }
 
     @Override

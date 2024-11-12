@@ -31,6 +31,9 @@ public class SaleService {
     TokenService tokenService;
 
     @Autowired
+    UserRepository userRepository;
+
+    @Autowired
     InventoryTransactionRepository inventoryTransactionRepository;
 
     public Sale makeSale(String token, Long paymentId){
@@ -81,6 +84,8 @@ public class SaleService {
         Sale sale = saleRepository.save(newSale);
 
         cart.clearCart();
+
+        user.setPoints((int) (newSale.getTotalPrice() * 5));
 
         return sale;
     }
