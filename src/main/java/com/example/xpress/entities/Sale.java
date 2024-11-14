@@ -17,9 +17,8 @@ public class Sale {
     @JsonManagedReference
     private List<SaleItem> items = new ArrayList<>();
 
-    @ManyToOne
     @JoinColumn(name = "payment_method")
-    private Payment payment;
+    private String payment;
 
     private int quantity;
     private double totalPrice;
@@ -30,6 +29,25 @@ public class Sale {
     @JsonBackReference
     private Users user;
 
+    private int earnedPoints;
+    private double discount;
+
+    public double getDiscount() {
+        return discount;
+    }
+
+    public int getEarnedPoints() {
+        return earnedPoints;
+    }
+
+    public void setEarnedPoints(int earnedPoints) {
+        this.earnedPoints = earnedPoints;
+    }
+
+    public void setDiscount(double discount) {
+        this.discount = discount;
+    }
+
     public int getQuantity() {
         return quantity;
     }
@@ -38,11 +56,11 @@ public class Sale {
         this.quantity = quantity;
     }
 
-    public Payment getPayment() {
+    public String getPayment() {
         return payment;
     }
 
-    public void setPayment(Payment payment) {
+    public void setPayment(String payment) {
         this.payment = payment;
     }
 

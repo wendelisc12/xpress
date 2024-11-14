@@ -1,13 +1,8 @@
 package com.example.xpress.controllers;
 
-import com.example.xpress.entities.Cart;
-import com.example.xpress.entities.CartItem;
-import com.example.xpress.entities.Sale;
-import com.example.xpress.entities.SaleItem;
-import com.example.xpress.repository.CartRepository;
+import com.example.xpress.entities.*;
 import com.example.xpress.repository.SaleRepository;
 import com.example.xpress.service.SaleService;
-import jakarta.persistence.Entity;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -25,21 +20,19 @@ public class SaleController {
     SaleService saleService;
 
     @GetMapping
-    public List<Sale> getSales(@RequestHeader("Authorization")String token){
-        List<Sale> results = saleRepository.findAll();
-        return results;
+    public List<Sale> getSales(){
+        return saleRepository.findAll();
     }
 
     @GetMapping("/{id}")
-    public Sale getSaleById(@RequestHeader("Authorization")String token, String id){
-        System.out.println(id);
+    public Sale getSaleById(String id){
         return saleRepository.findById(id).orElseThrow(() -> new RuntimeException("Sale not found."));
     }
 
     @PostMapping
     @Transactional
-    public ResponseEntity makeSale(@RequestHeader("Authorization") String token, @RequestParam Long paymentId){
-        Sale results = saleService.makeSale(token, paymentId);
+    public ResponseEntity makeSale(@RequestHeader("Authorization") String token, @RequestParam PaymentMethodEnum paymentMethod, @RequestParam(defaultValue = "0") int points){
+        Sale results = saleService.makeSale(token, paymentMethod, points);
         Map<String, Object> response = new HashMap<>();
         response.put("sale", results);
         boolean isStockLow = results.getItems().stream().anyMatch(item -> item.getProduct().getQttStock() <= 10);
