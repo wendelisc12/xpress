@@ -30,6 +30,7 @@ public class InventoryTransaction {
     @JsonView(Views.Internal.class)
     private Users user;
 
+    @JsonView(Views.Internal.class)
     private int quantity;
 
     public int getQuantity() {
