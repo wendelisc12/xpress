@@ -30,7 +30,16 @@ public class Sale {
     private Users user;
 
     private int earnedPoints;
+    private String coupon;
     private double discount;
+
+    public String getCoupon() {
+        return coupon;
+    }
+
+    public void setCoupon(String coupon) {
+        this.coupon = coupon;
+    }
 
     public double getDiscount() {
         return discount;

@@ -1,6 +1,5 @@
 package com.example.xpress.secutiry;
 
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,7 +14,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import java.nio.file.AccessDeniedException;
 
 @Configuration
 @EnableWebSecurity
@@ -32,7 +30,7 @@ public class SecurityConfigurations {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.POST, "/auth/login", "/auth/register").permitAll()
                         .requestMatchers(HttpMethod.GET, "/products", "/products/{id}", "/category", "category/{id}/products").permitAll()
-                        .requestMatchers("/inventoryTransaction").hasRole("ADMIN")
+                        .requestMatchers("/inventoryTransaction", "/coupons", "/coupons/{id}", "/coupons/user/{id}", "user/{id}", "user/coupons/{id}").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/auth/users").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET,"/sale", "sale/{id}").hasRole("USER")
                         .requestMatchers(HttpMethod.POST, "/products", "/products/addStock/{id}",  "/category", "/cart", "/paymentMethods").hasRole("ADMIN")
