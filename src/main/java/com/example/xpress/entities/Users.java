@@ -2,6 +2,7 @@ package com.example.xpress.entities;
 
 import com.example.xpress.views.Views;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
@@ -10,6 +11,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -53,10 +55,22 @@ public class Users implements UserDetails {
     @JsonView(Views.Internal.class)
     private Cart cart;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
     @JsonManagedReference
     @JsonView(Views.Internal.class)
     private List<Sale> sale;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<UsedCoupon> usedCoupons = new ArrayList<>();
+
+    public List<UsedCoupon> getUsedCoupons() {
+        return usedCoupons;
+    }
+
+    public void setUsedCoupons(List<UsedCoupon> usedCoupons) {
+        this.usedCoupons = usedCoupons;
+    }
 
     public Long getId() {
         return id;

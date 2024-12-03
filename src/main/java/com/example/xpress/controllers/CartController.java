@@ -8,10 +8,7 @@ import com.example.xpress.repository.CartRepository;
 import com.example.xpress.repository.UserRepository;
 import com.example.xpress.service.CartService;
 import com.example.xpress.service.TokenService;
-import org.antlr.v4.runtime.Token;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

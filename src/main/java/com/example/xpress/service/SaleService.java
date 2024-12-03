@@ -29,9 +29,13 @@ public class SaleService {
     @Autowired
     InventoryTransactionRepository inventoryTransactionRepository;
 
-    public Sale makeSale(String token, PaymentMethodEnum paymentMethod, int points){
+    @Autowired
+    CouponService couponService;
+
+    public Sale makeSale(String token, PaymentMethodEnum paymentMethod, int points, String coupon){
         Cart cart = tokenService.getUserByToken(token).getCart();
         Users user = tokenService.getUserByToken(token);
+        double discountCoupon = 0;
         double discount = 0;
 
         if(points > user.getPoints()){
@@ -45,16 +49,28 @@ public class SaleService {
         if(points != 0){
             discount = usePoints(user, points, cart.getTotalPrice());
         }
+        if(!coupon.isEmpty()){
+            discountCoupon = couponService.useCoupon(token, coupon, cart.getTotalPrice());
+            discount += discountCoupon;
+        }
+
+        System.out.println(discount);
 
         Sale newSale = new Sale();
         int earnedPoints = (int) (cart.getTotalPrice() * 5);
         newSale.setId(UUID.randomUUID().toString());
         newSale.setDate(new Date());
         newSale.setQuantity(cart.getTotalQuantity());
-        newSale.setTotalPrice(cart.getTotalPrice() - discount);
+        if(discount >= cart.getTotalPrice()){
+            newSale.setTotalPrice(0);
+        }else{
+            newSale.setTotalPrice(cart.getTotalPrice() - discount);
+        }
+
         newSale.setPayment(paymentMethod.getPaymentMethod());
         newSale.setUser(user);
         newSale.setDiscount(discount);
+        newSale.setCoupon(coupon);
         newSale.setEarnedPoints(earnedPoints);
 
         List<SaleItem> saleItemList = new ArrayList<>();

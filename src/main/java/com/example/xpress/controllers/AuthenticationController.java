@@ -10,7 +10,6 @@ import com.example.xpress.secutiry.LoginResponseDTO;
 import com.example.xpress.secutiry.SecurityFilter;
 import com.example.xpress.service.TokenService;
 import jakarta.validation.Valid;
-import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -46,13 +45,6 @@ public class AuthenticationController {
         return ResponseEntity.ok(new LoginResponseDTO(token, "logged in successfully."));
     }
 
-    @GetMapping("/users")
-    public List<Users> getUsers(@RequestHeader String token){
-        List<Users> results = this.userRepository.findAll();
-        return results;
-    }
-
-
     @PostMapping("/register")
     public ResponseEntity register(@RequestBody @Valid RegisterDTO data){
         if(userRepository.findByEmail(data.email()) != null){
@@ -81,12 +73,5 @@ public class AuthenticationController {
         SecurityFilter.invalidateToken(token);
         return ResponseEntity.ok("Logged off successfully");
     }
-
-    @GetMapping("/points")
-    public int getPoints(@RequestHeader("Authorization") String token){
-        Users user = tokenService.getUserByToken(token);
-        return user.getPoints();
-    }
-
 
 }

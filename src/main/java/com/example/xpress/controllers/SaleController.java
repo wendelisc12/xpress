@@ -31,8 +31,8 @@ public class SaleController {
 
     @PostMapping
     @Transactional
-    public ResponseEntity makeSale(@RequestHeader("Authorization") String token, @RequestParam PaymentMethodEnum paymentMethod, @RequestParam(defaultValue = "0") int points){
-        Sale results = saleService.makeSale(token, paymentMethod, points);
+    public ResponseEntity makeSale(@RequestHeader("Authorization") String token, @RequestParam PaymentMethodEnum paymentMethod, @RequestParam(defaultValue = "0") int points, @RequestParam(defaultValue = "")String coupon){
+        Sale results = saleService.makeSale(token, paymentMethod, points, coupon);
         Map<String, Object> response = new HashMap<>();
         response.put("sale", results);
         boolean isStockLow = results.getItems().stream().anyMatch(item -> item.getProduct().getQttStock() <= 10);
